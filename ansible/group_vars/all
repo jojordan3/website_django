@@ -1,0 +1,11 @@
+project_repo: git@github.com:jojordan3/website_wagtail.git
+project_title: Jazmin Leon
+project_name: website_wagtail 
+sites_dir:  /usr/local/sites
+virtualenvs_dir: /home/django/virtualenvs/
+nginx_root_dir:  /etc/nginx/sites-available
+gunicorn:  127.0.0.1:2015
+deploy_user: xgbeuybg 
+keystore_path: website_wagtail_keystore 
+vcs: git
+vcs_host: github.com
