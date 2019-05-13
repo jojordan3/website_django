@@ -7,7 +7,7 @@ __pycache__/
 
 ansible/group_vars/*
 ansible/host_vars/*
-ansible/website_wagtail_keystore/*
+ansible/jazminleon_keystore/*
 # C extensions
 *.so
 

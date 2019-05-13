@@ -10,7 +10,7 @@ django_env:
     DB_NAME: website_wagtail_db 
     EMAIL_HOST: 'smtp.gmail.com'
     EMAIL_FROM: 'noreply@jazminleon.com'
-    EMAIL_USER: 'joanne@jazminleon.com'
+    EMAIL_USER: 'jazmin@jazminleon.com'
     EMAIL_PASSWD: 'PawPaw378'
     DJANGO_ADMIN_USER: 'jleon1521'
     DJANGO_ADMIN_PASSWD: 'KMLLCAa@0802'
