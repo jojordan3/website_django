@@ -32,8 +32,11 @@ urlpatterns = [
     path('documents/', include(wagtaildocs_urls)),
 
     path('sitemap.xml', sitemap),
-    path('blog/feed/basic', BasicFeed(), name='basic_feed'),
-    path('blog/feed/extended', ExtendedFeed(), name='extended_feed'),
+    path('blog/feed/basic/', BasicFeed(), name='basic_feed'),
+    path('blog/feed/extended/', ExtendedFeed(), name='extended_feed'),
+
+    path('privacy-policy/', TemplateView.as_view(template_name='pages/privacy.html'), name='privacy'),
+    path('terms-of-service/', TemplateView.as_view(template_name='pages/terms.html'), name='terms'),
 
     path(
         r'^images/([^/]*)/(\d*)/([^/]*)/[^/]*$',

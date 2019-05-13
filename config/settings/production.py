@@ -1,3 +1,4 @@
+import datetime
 from .base import *  # noqa
 from .base import env
 
@@ -38,7 +39,7 @@ INSTALLED_APPS += [
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': env.db('REDIS_URL'),
+        'LOCATION': env.db('REDIS_CACHE_URL'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             # Mimicing memcache behavior.
@@ -95,6 +96,8 @@ AWS_ACCESS_KEY_ID = env('DJANGO_AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = env('DJANGO_AWS_SECRET_ACCESS_KEY')
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
 AWS_STORAGE_BUCKET_NAME = env('DJANGO_AWS_STORAGE_BUCKET_NAME')
+AWS_CONTENT_BUCKET_NAME = env('DJANGO_AWS_CONTENT_BUCKET_NAME')
+AWS_MEDIA_CONTAINER = env('DJANGO_AWS_MEDIA_CONTAINER')
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
 AWS_QUERYSTRING_AUTH = False
 # DO NOT change these unless you know what you're doing.
@@ -132,7 +135,20 @@ class MediaRootS3Boto3Storage(S3Boto3Storage):
 
 # endregion
 DEFAULT_FILE_STORAGE = 'config.settings.production.MediaRootS3Boto3Storage'
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+MEDIA_URL = f'https://{AWS_CONTENT_BUCKET_NAME}.s3.amazonaws.com'
+
+date_format = "%a, %b %d %Y %H:%M:%S"
+
+exp_date = datetime.datetime.today() + datetime.timedelta(weeks=1)
+
+AWS_HEADERS = {
+    'Expires': f'{exp_date.strftime(date_format)} PST',
+    'Cache-Control': 'max-age=86400',
+}
+CLOUDFRONT_DOMAIN = env('CLOUDFRONT_DOMAIN')
+CLOUDFRONT_ID = env.str('CLOUDFRONT_ID')
+AWS_S3_CUSTOM_DOMAIN = env('CLOUDFRONT_DOMAIN')
+
 
 # TEMPLATES
 # ------------------------------------------------------------------------------
@@ -145,6 +161,7 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [  # noqa F405
             'django.template.loaders.app_directories.Loader',
         ]
     ),
+    
 ]
 
 GA_KEY_FILEPATH = ROOT_DIR.path('ansible').path('website_wagtail_keystore').path('jazmin-leon-llc-2da3bcf1a044.json')
@@ -200,7 +217,7 @@ import djcelery
 djcelery.setup_loader()
 
 CELERY_SEND_TASK_ERROR_EMAILS = True
-BROKER_URL = 'redis://'
+BROKER_URL = env.db('REDIS_BACKUP_URL')
 
 # LOGGING
 # ------------------------------------------------------------------------------

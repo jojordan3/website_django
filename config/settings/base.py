@@ -84,7 +84,6 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount.providers.amazon',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.linkedin_oauth2',
     'allauth.socialaccount.providers.twitter',
     'rest_framework',
 ]
@@ -299,7 +298,7 @@ MANAGERS = ADMINS
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION', True)
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_REQUIRED = True
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
@@ -308,6 +307,9 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_ADAPTER = 'website_django.users.adapters.AccountAdapter'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = 'website_django.users.adapters.SocialAccountAdapter'
+ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Jazmin Leon Mindset Coach & Strategist'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 
 
 # django-libsass
@@ -345,13 +347,13 @@ GA_VIEW_ID = env('GA_VIEW_ID', default='ga:xxxxxxxxxxxxx')
 # When you have multiple sites using the same Redis server,
 # specify a different Redis DB. e.g. redis://localhost/5
 
-BROKER_URL = 'redis://'
+BROKER_URL = env.db('REDIS_BACKUP_URL')
 
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERYD_LOG_COLOR = False
 
 
-SOCIALACCOUNT_PROVIDERS = '''{
+SOCIALACCOUNT_PROVIDERS = {
     'facebook': {
         'METHOD': 'oauth2',
         'SCOPE': ['email', 'public_profile',],
@@ -368,5 +370,15 @@ SOCIALACCOUNT_PROVIDERS = '''{
         'EXCHANGE_TOKEN': True,
         'VERIFIED_EMAIL': False,
         'VERSION': 'v3.3',
-    }
-}'''
+    },
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    },
+
+}

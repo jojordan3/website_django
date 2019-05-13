@@ -102,7 +102,6 @@ class ProductPage(Page):
     price = models.CharField(max_length=255, blank=True)
     description = RichTextField(blank=True)
     intro = models.CharField(max_length=255, blank=True)
-    link_demo = models.URLField("Demo link", blank=True)
     tags = ClusterTaggableManager(through=ProductPageTag, blank=True)
     image = models.ForeignKey(
         Image,
