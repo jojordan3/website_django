@@ -5,7 +5,7 @@ Base settings to build other settings files upon.
 import environ
 
 ROOT_DIR = environ.Path(__file__) - 3  # (website_django/config/settings/base.py - 3 = website_django/)
-APPS_DIR = ROOT_DIR.path('website_django')
+APPS_DIR = ROOT_DIR.path('website_wagtail')
 
 env = environ.Env()
 
@@ -28,7 +28,7 @@ LANGUAGE_CODE = 'en-us'
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
-USE_I18N = True
+USE_I18N = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
 USE_L10N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
@@ -39,8 +39,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres:///website_django'),
+    'default': env.db('DATABASE_URL', default='postgres:///website_wagtail'),
 }
+
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 # URLS
@@ -49,6 +50,12 @@ DATABASES['default']['ATOMIC_REQUESTS'] = True
 ROOT_URLCONF = 'config.urls'
 # https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = 'config.wsgi.application'
+
+WAGTAILADMIN_RICH_TEXT_EDITORS = {
+    'default': {
+        'WIDGET': 'wagtail.admin.rich_text.HalloRichTextArea'
+    }
+}
 
 # APPS
 # ------------------------------------------------------------------------------
@@ -64,24 +71,76 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'foundation_formtags',  # Form layouts
+    'compressor',
+    'taggit',
+    'modelcluster',
+    
+    'foundation_formtags',
+    'wagtail_feeds',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.amazon',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.linkedin_oauth2',
+    'allauth.socialaccount.providers.twitter',
     'rest_framework',
 ]
 LOCAL_APPS = [
-    'website_django.users.apps.UsersAppConfig',
+    'website_wagtail.users.apps.UsersAppConfig',
     # Your stuff: custom apps go here
+    'website_wagtail.blog',
+    'website_wagtail.contact',
+    'website_wagtail.documents_gallery',
+    'website_wagtail.events',
+    'website_wagtail.gallery',
+    'website_wagtail.pages',
+    'website_wagtail.people',
+    'website_wagtail.products',
+    'website_wagtail.search',
+    'website_wagtail.utils',
+]
+
+WAGTAIL_APPS = [
+    'wagtail.contrib.routable_page',
+    'wagtail.contrib.sitemaps',
+    'wagtail.contrib.search_promotions',
+    'wagtail.contrib.postgres_search',
+    'wagtail.contrib.settings',
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
+    'wagtailfontawesome',
+    'wagtailmarkdown',
+    'wagalytics', 
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + WAGTAIL_APPS
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
 MIGRATION_MODULES = {
-    'sites': 'website_django.contrib.sites.migrations'
+    'sites': 'website_wagtail.contrib.sites.migrations',
+    'blog': 'website_wagtail.blog.migrations',
+    'contact': 'website_wagtail.contact.migrations',
+    'documents_gallery': 'website_wagtail.documents_gallery.migrations',
+    'events': 'website_wagtail.events.migrations',
+    'gallery': 'website_wagtail.gallery.migrations',
+    'pages': 'website_wagtail.pages.migrations',
+    'people': 'website_wagtail.people.migrations',
+    'products': 'website_wagtail.products.migrations',
+    'users': 'website_wagtail.users.migrations',
 }
 
 # AUTHENTICATION
@@ -136,6 +195,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',   
 ]
 
 # STATIC
@@ -152,6 +214,7 @@ STATICFILES_DIRS = [
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
 # MEDIA
@@ -186,11 +249,12 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                'wagtail.contrib.settings.context_processors.settings',
+                'django.template.context_processors.request',
             ],
         },
     },
@@ -245,11 +309,6 @@ ACCOUNT_ADAPTER = 'website_django.users.adapters.AccountAdapter'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = 'website_django.users.adapters.SocialAccountAdapter'
 
-# django-compressor
-# ------------------------------------------------------------------------------
-# https://django-compressor.readthedocs.io/en/latest/quickstart/#installation
-INSTALLED_APPS += ["compressor", ]
-STATICFILES_FINDERS += ["compressor.finders.CompressorFinder", ]
 
 # django-libsass
 COMPRESS_PRECOMPILERS = [
@@ -260,5 +319,54 @@ COMPRESS_CACHEABLE_PRECOMPILERS = (
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
 
+COMPRESS_OFFLINE = False
+
 # Your stuff...
 # ------------------------------------------------------------------------------
+# Wagtail settings
+
+LOGIN_URL = 'wagtailadmin_login'
+LOGIN_REDIRECT_URL = 'wagtailadmin_home'
+
+WAGTAIL_SITE_NAME = "Jazmin Leon"
+
+# Good for sites having less than a million pages.
+# Use Elasticsearch as the search backend for extra performance search results
+WAGTAILSEARCH_BACKENDS = {
+    'default': {
+        'BACKEND': 'wagtail.contrib.postgres_search.backend',
+    },
+}
+
+GA_KEY_CONTENT = env('GA_KEY_CONTENT', default='/path/to/secure/directory/your-key.json')
+GA_VIEW_ID = env('GA_VIEW_ID', default='ga:xxxxxxxxxxxxx')
+
+# Celery settings
+# When you have multiple sites using the same Redis server,
+# specify a different Redis DB. e.g. redis://localhost/5
+
+BROKER_URL = 'redis://'
+
+CELERY_SEND_TASK_ERROR_EMAILS = True
+CELERYD_LOG_COLOR = False
+
+
+SOCIALACCOUNT_PROVIDERS = '''{
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile',],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'short_name',
+        ],
+        'EXCHANGE_TOKEN': True,
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v3.3',
+    }
+}'''

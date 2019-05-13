@@ -8,7 +8,8 @@ Collectfast>=0.6.2  # https://github.com/antonagestam/collectfast
 
 # Django
 # ------------------------------------------------------------------------------
-django-storages>=1.7.1  # https://github.com/jschneier/django-storages
+django-storages[google]>=1.7.1  # https://github.com/jschneier/django-storages
+django-storages[boto3]>=1.7.1
 django-anymail>=5.0  # https://github.com/anymail/django-anymail
 
 django-celery>=3.2.2

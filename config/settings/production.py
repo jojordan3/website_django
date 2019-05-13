@@ -1,6 +1,9 @@
 from .base import *  # noqa
 from .base import env
 
+DEBUG = env.bool('DJANGO_DEBUG', default=False)
+TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
+
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
@@ -8,18 +11,34 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['jazminleon.com'])
 
+COMPRESS_OFFLINE = True
+
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter',
+]
+
+
 # DATABASES
 # ------------------------------------------------------------------------------
 DATABASES['default'] = env.db('DATABASE_URL')  # noqa F405
 DATABASES['default']['ATOMIC_REQUESTS'] = True  # noqa F405
 DATABASES['default']['CONN_MAX_AGE'] = env.int('CONN_MAX_AGE', default=60)  # noqa F405
 
+DATABASES['default'] = env.db('PROD_DATABASE_URL')
+
+INSTALLED_APPS += [
+    'wagtail.contrib.frontend_cache',
+    'gunicorn',
+]
+
+
 # CACHES
 # ------------------------------------------------------------------------------
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': env('REDIS_URL'),
+        'LOCATION': env.db('REDIS_URL'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             # Mimicing memcache behavior.
@@ -28,6 +47,21 @@ CACHES = {
         }
     }
 }
+
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
+)
+
+WAGTAIL_SITE_NAME = 'Jazmin Leon'
+
 
 # SECURITY
 # ------------------------------------------------------------------------------
@@ -50,6 +84,7 @@ SECURE_HSTS_PRELOAD = env.bool('DJANGO_SECURE_HSTS_PRELOAD', default=True)
 # https://docs.djangoproject.com/en/dev/ref/middleware/#x-content-type-options-nosniff
 SECURE_CONTENT_TYPE_NOSNIFF = env.bool('DJANGO_SECURE_CONTENT_TYPE_NOSNIFF', default=True)
 
+
 # STORAGES
 # ------------------------------------------------------------------------------
 # https://django-storages.readthedocs.io/en/latest/#installation
@@ -69,6 +104,9 @@ AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': f'max-age={_AWS_EXPIRY}, s-maxage={_AWS_EXPIRY}, must-revalidate',
 }
 
+AWS_DEFAULT_ACL = authenticated-read
+AWS_S3_ENCRYPTION = True
+AWS_S3_FILE_OVERWRITE = False
 # STATIC
 # ------------------------
 
@@ -94,7 +132,7 @@ class MediaRootS3Boto3Storage(S3Boto3Storage):
 
 # endregion
 DEFAULT_FILE_STORAGE = 'config.settings.production.MediaRootS3Boto3Storage'
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
 # TEMPLATES
 # ------------------------------------------------------------------------------
@@ -108,6 +146,8 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [  # noqa F405
         ]
     ),
 ]
+
+GA_KEY_FILEPATH = ROOT_DIR.path('ansible').path('website_wagtail_keystore').path('jazmin-leon-llc-2da3bcf1a044.json')
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -155,6 +195,12 @@ COMPRESS_URL = STATIC_URL # noqa F405# Collectfast
 INSTALLED_APPS = ['collectfast'] + INSTALLED_APPS  # noqa F405
 AWS_PRELOAD_METADATA = True
 
+import djcelery
+
+djcelery.setup_loader()
+
+CELERY_SEND_TASK_ERROR_EMAILS = True
+BROKER_URL = 'redis://'
 
 # LOGGING
 # ------------------------------------------------------------------------------

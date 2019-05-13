@@ -4,6 +4,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+ansible/group_vars/*
+ansible/host_vars/*
+ansible/website_wagtail_keystore/*
 # C extensions
 *.so
 

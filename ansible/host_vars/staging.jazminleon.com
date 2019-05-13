@@ -1,17 +1,17 @@
 ---
 use_ssl: false
 django_env:
-    SECRET_KEY: your_secret_key 
+    SECRET_KEY: 'vOf6iVRhpjjMQaMrp/VlAIr0Mqsh31g145IMDXa0ePolkBaFiBCrdcl8DEMc5EVci+ret8XA9H2mvTmaYfpHtQ'
     DJANGO_SETTINGS_MODULE: website_wagtail.settings.production
     HOST_NAME: staging.jazminleon.com
-    DB_USER: django
-    DB_PASSWD: change_db_password!!!
-    DB_HOST: localhost
+    DB_USER: xgbeuybg
+    DB_PASSWD: Infinity0802
+    DB_HOST: 12.0.0.1
     DB_NAME: website_wagtail_db 
-    EMAIL_HOST: 'email_host'
-    EMAIL_FROM: 'support@chrisdev.com'
-    EMAIL_USER: 'email_user'
-    EMAIL_PASSWD: 'email_passwd'
-    DJANGO_ADMIN_USER: jleon1521
-    DJANGO_ADMIN_PASSWD: 'your_admin_password'
+    EMAIL_HOST: 'smtp.gmail.com'
+    EMAIL_FROM: 'noreply@jazminleon.com'
+    EMAIL_USER: 'joanne@jazminleon.com'
+    EMAIL_PASSWD: 'PawPaw378'
+    DJANGO_ADMIN_USER: 'jleon1521'
+    DJANGO_ADMIN_PASSWD: 'KMLLCAa@0802'
 
