@@ -35,6 +35,8 @@
     - fail2ban
     - aptitude
     - acl
+    autoconf
+
   tags:
       - packages 
 
