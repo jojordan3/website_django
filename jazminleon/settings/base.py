@@ -128,15 +128,6 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + WAGTAIL_APPS
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
 MIGRATION_MODULES = {
     'sites': 'contrib.sites.migrations',
-    'blog': 'jazminleon.blog.migrations',
-    'contact': 'jazminleon.contact.migrations',
-    'documents_gallery': 'jazminleon.documents_gallery.migrations',
-    'events': 'jazminleon.events.migrations',
-    'gallery': 'jazminleon.gallery.migrations',
-    'pages': 'jazminleon.pages.migrations',
-    'people': 'jazminleon.people.migrations',
-    'products': 'jazminleon.products.migrations',
-    'users': 'jazminleon.users.migrations',
 }
 
 # AUTHENTICATION
