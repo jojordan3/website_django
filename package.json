@@ -1,7 +1,9 @@
 {
     "name": "jazminleon",
     "version": "0.1.0",
-    "dependencies": {},
+    "dependencies": {
+        "what-input": "^5.2.1"
+    },
     "devDependencies": {
         "browser-sync": "^2.14.0",
         "del": "^2.2.2",
