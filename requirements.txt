@@ -50,7 +50,7 @@ Markdown==2.6.11
 MarkupSafe==1.1.1
 oauth2client==2.2.0
 oauthlib==3.0.1
-Pillow==5.4.1
+Pillow==8.3.2
 protobuf==3.7.1
 psycopg2==2.8.2
 psycopg2-binary==2.8.2
